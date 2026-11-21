@@ -1,0 +1,659 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise Process Challenge</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 25px 14px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#111c4e,#273b91,#542b83);
+  color: #172554;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 28px;
+  background: white;
+  border-radius: 22px;
+  box-shadow: 0 15px 45px rgba(0,0,0,.25);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.tag {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 7px 14px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+h1 {
+  color: #172554;
+  margin: 14px 0 8px;
+  font-size: clamp(27px,5vw,38px);
+}
+
+.subtitle {
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.instructions {
+  background: #eff6ff;
+  border-left: 5px solid #3b82f6;
+  padding: 16px;
+  border-radius: 10px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.executive {
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+
+.executive strong {
+  color: #5b21b6;
+}
+
+.game-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.timer {
+  font-size: 27px;
+  font-weight: bold;
+  color: #1d4ed8;
+  background: #eff6ff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  min-width: 130px;
+  text-align: center;
+}
+
+.timer.warning {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.status {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 13px;
+  padding: 14px;
+  transition: .2s;
+}
+
+.step:hover {
+  border-color: #818cf8;
+  background: #eef2ff;
+}
+
+.number {
+  background: #312e81;
+  color: white;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.step-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-title {
+  font-weight: bold;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.step-translation {
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.move-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.move-buttons button {
+  background: #e0e7ff;
+  color: #312e81;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 11px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.move-buttons button:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+}
+
+button {
+  font-family: inherit;
+}
+
+.main-button {
+  border: none;
+  border-radius: 10px;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.main-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.main-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.start {
+  background: #4f46e5;
+  color: white;
+}
+
+.check {
+  background: #059669;
+  color: white;
+}
+
+.reset {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 22px 0;
+}
+
+.feedback {
+  display: none;
+  margin-top: 22px;
+  padding: 20px;
+  border-radius: 14px;
+  line-height: 1.6;
+}
+
+.feedback.success {
+  display: block;
+  background: #ecfdf5;
+  border: 2px solid #10b981;
+}
+
+.feedback.partial {
+  display: block;
+  background: #fff7ed;
+  border: 2px solid #fb923c;
+}
+
+.feedback h2 {
+  margin-top: 0;
+}
+
+.correct-order {
+  margin-top: 15px;
+  padding-left: 22px;
+}
+
+.correct-order li {
+  margin: 7px 0;
+}
+
+.reflection {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  line-height: 1.6;
+}
+
+.footer {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 25px;
+}
+
+@media(max-width:600px) {
+  .container {
+    padding: 18px;
+  }
+
+  .step {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .move-buttons {
+    margin-left: 48px;
+  }
+
+  .game-bar {
+    justify-content: center;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <span class="tag">CAMBRIDGE IGCSE ENTERPRISE 0454</span>
+  <h1>Enterprise Process Challenge</h1>
+  <p class="subtitle">
+    Grade 9 | Working Memory and Executive Control
+  </p>
+</header>
+
+<div class="instructions">
+  <strong>Your mission:</strong>
+  Organise the six stages of the Enterprise Process
+  in the correct sequence.
+
+  <br><br>
+  You have <strong>3 minutes</strong> to complete the challenge.
+  Use the arrows to move each stage up or down.
+  Check your sequence before submitting.
+</div>
+
+<div class="executive">
+  <strong>Executive Central Challenge</strong>
+  <p>
+    Keep the goal in mind, update the order of the stages,
+    control impulsive decisions and monitor your progress.
+    Think before you move!
+  </p>
+</div>
+
+<div class="game-bar">
+  <div>
+    <div class="status" id="gameStatus">Ready to start</div>
+    <div class="status">Arrange all six stages.</div>
+  </div>
+
+  <div class="timer" id="timer">03:00</div>
+</div>
+
+<div class="steps" id="steps"></div>
+
+<div class="controls">
+  <button class="main-button start" id="startBtn"
+    onclick="startGame()">
+    Start challenge
+  </button>
+
+  <button class="main-button check" id="checkBtn"
+    onclick="finishGame(false)" disabled>
+    Check my sequence
+  </button>
+
+  <button class="main-button reset" onclick="resetGame()">
+    Restart
+  </button>
+</div>
+
+<div id="feedback" class="feedback" aria-live="polite"></div>
+
+<div class="reflection" id="reflection">
+  <strong>Think strategically:</strong>
+  Which stage comes first? What information do you need
+  to make a decision? How can you check that your sequence
+  makes sense?
+</div>
+
+<div class="footer">
+  Learning activity inspired by the Cambridge IGCSE Enterprise 0454 syllabus.
+</div>
+
+</div>
+
+<script>
+const originalSteps = [
+  {
+    title: "Identifying the problem or need or want",
+    translation: "Identificar el problema, necesidad o deseo."
+  },
+  {
+    title: "Exploring creative solutions",
+    translation: "Explorar soluciones creativas."
+  },
+  {
+    title: "Action planning",
+    translation: "Elaborar el plan de acción."
+  },
+  {
+    title: "Implementing the plan",
+    translation: "Implementar el plan."
+  },
+  {
+    title: "Monitoring progress",
+    translation: "Supervisar el progreso."
+  },
+  {
+    title: "Evaluation of successes and failures",
+    translation: "Evaluar los éxitos y los fracasos."
+  }
+];
+
+let currentSteps = [];
+let timeLeft = 180;
+let timerInterval = null;
+let startTime = null;
+let gameStarted = false;
+let gameFinished = false;
+
+const stepsContainer = document.getElementById("steps");
+
+function shuffle(array) {
+  const result = [...array];
+
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  // Prevent a round from accidentally starting in the correct order.
+  if (result.every((step, index) =>
+      step.title === array[index].title)) {
+    return shuffle(array);
+  }
+
+  return result;
+}
+
+function renderSteps() {
+  stepsContainer.innerHTML = "";
+
+  currentSteps.forEach((step, index) => {
+    const card = document.createElement("div");
+    card.className = "step";
+
+    const number = document.createElement("div");
+    number.className = "number";
+    number.textContent = index + 1;
+
+    const content = document.createElement("div");
+    content.className = "step-content";
+
+    const title = document.createElement("div");
+    title.className = "step-title";
+    title.textContent = step.title;
+
+    const translation = document.createElement("div");
+    translation.className = "step-translation";
+    translation.textContent = step.translation;
+
+    content.appendChild(title);
+    content.appendChild(translation);
+
+    const moveButtons = document.createElement("div");
+    moveButtons.className = "move-buttons";
+
+    const up = document.createElement("button");
+    up.textContent = "↑";
+    up.title = "Move up";
+    up.setAttribute("aria-label", "Move stage up");
+    up.disabled = !gameStarted || gameFinished || index === 0;
+    up.onclick = () => moveStep(index, -1);
+
+    const down = document.createElement("button");
+    down.textContent = "↓";
+    down.title = "Move down";
+    down.setAttribute("aria-label", "Move stage down");
+    down.disabled =
+      !gameStarted || gameFinished ||
+      index === currentSteps.length - 1;
+    down.onclick = () => moveStep(index, 1);
+
+    moveButtons.appendChild(up);
+    moveButtons.appendChild(down);
+
+    card.appendChild(number);
+    card.appendChild(content);
+    card.appendChild(moveButtons);
+
+    stepsContainer.appendChild(card);
+  });
+}
+
+function moveStep(index, direction) {
+  if (!gameStarted || gameFinished) return;
+
+  const newIndex = index + direction;
+
+  if (newIndex < 0 || newIndex >= currentSteps.length) return;
+
+  const temp = currentSteps[index];
+  currentSteps[index] = currentSteps[newIndex];
+  currentSteps[newIndex] = temp;
+
+  renderSteps();
+}
+
+function startGame() {
+  if (gameStarted && !gameFinished) return;
+
+  clearInterval(timerInterval);
+
+  currentSteps = shuffle(originalSteps);
+  timeLeft = 180;
+  gameStarted = true;
+  gameFinished = false;
+  startTime = Date.now();
+
+  document.getElementById("feedback").className = "feedback";
+  document.getElementById("feedback").innerHTML = "";
+  document.getElementById("reflection").style.display = "none";
+
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("checkBtn").disabled = false;
+  document.getElementById("gameStatus").textContent =
+    "Challenge in progress";
+
+  updateTimer();
+  renderSteps();
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+
+    if (timeLeft <= 0) {
+      finishGame(true);
+    }
+  }, 1000);
+}
+
+function updateTimer() {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+
+  const display =
+    String(minutes).padStart(2, "0") + ":" +
+    String(seconds).padStart(2, "0");
+
+  const timer = document.getElementById("timer");
+  timer.textContent = display;
+  timer.classList.toggle("warning", timeLeft <= 30);
+}
+
+function finishGame(timeExpired) {
+  if (!gameStarted || gameFinished) return;
+
+  gameFinished = true;
+  clearInterval(timerInterval);
+
+  const elapsed = Math.min(
+    180,
+    Math.floor((Date.now() - startTime) / 1000)
+  );
+
+  let correctPositions = 0;
+
+  currentSteps.forEach((step, index) => {
+    if (step.title === originalSteps[index].title) {
+      correctPositions++;
+    }
+  });
+
+  const isCorrect = correctPositions === originalSteps.length;
+  const feedback = document.getElementById("feedback");
+
+  feedback.className =
+    "feedback " + (isCorrect ? "success" : "partial");
+
+  let message = "";
+
+  if (isCorrect) {
+    message = `
+      <h2>Excellent work! 🎉</h2>
+      <p>You organised all six stages correctly.</p>
+    `;
+  } else {
+    message = `
+      <h2>Good effort! Keep learning.</h2>
+      <p>
+        You placed ${correctPositions} out of 6 stages
+        in their correct positions.
+      </p>
+    `;
+  }
+
+  const timeMessage = timeExpired
+    ? "The 3-minute time limit was reached."
+    : "You completed the activity before the time limit.";
+
+  message += `
+    <p><strong>Time used:</strong> ${formatTime(elapsed)}</p>
+    <p><strong>Correct positions:</strong>
+      ${correctPositions}/6</p>
+    <p>${timeMessage}</p>
+  `;
+
+  if (!isCorrect) {
+    message += `
+      <h3>Review the correct sequence:</h3>
+      <ol class="correct-order">
+    `;
+
+    originalSteps.forEach(step => {
+      message += `<li>${step.title}</li>`;
+    });
+
+    message += `</ol>`;
+  }
+
+  message += `
+    <p><strong>Executive control reflection:</strong>
+    You had to maintain the goal, update the sequence,
+    monitor your decisions and manage your time.</p>
+  `;
+
+  feedback.innerHTML = message;
+
+  document.getElementById("gameStatus").textContent =
+    "Challenge completed";
+
+  document.getElementById("checkBtn").disabled = true;
+  document.getElementById("startBtn").disabled = false;
+
+  renderSteps();
+}
+
+function formatTime(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes} min ${String(seconds).padStart(2, "0")} sec`;
+}
+
+function resetGame() {
+  clearInterval(timerInterval);
+
+  gameStarted = false;
+  gameFinished = false;
+  timeLeft = 180;
+
+  currentSteps = shuffle(originalSteps);
+
+  document.getElementById("timer").classList.remove("warning");
+  document.getElementById("timer").textContent = "03:00";
+
+  document.getElementById("gameStatus").textContent = "Ready to start";
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("checkBtn").disabled = true;
+
+  document.getElementById("feedback").className = "feedback";
+  document.getElementById("feedback").innerHTML = "";
+  document.getElementById("reflection").style.display = "block";
+
+  renderSteps();
+}
+
+resetGame();
+</script>
+
+</body>
+</html>
